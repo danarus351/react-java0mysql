@@ -1,0 +1,44 @@
+services:
+  backend:
+    image: react-java-backend:latest
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    volumes:
+      - ./backend/backend-data:/tmp
+    secrets:
+      - source: mariadb_root_password
+        target: /run/secrets/db-password
+    depends_on:
+      db:
+        condition: service_healthy
+  db:
+    image: mariadb:10.6.4-focal
+    environment:
+      - MYSQL_DATABASE=example 
+      - MARIADB_ROOT_PASSWORD_FILE=/run/secrets/mariadb_root_password
+    secrets:
+      - mariadb_root_password
+    healthcheck:
+      test: ["CMD-SHELL", "bash", "-c", "mariadb", "-u", "root", "-p$(cat /run/secrets/mariadb_root_password)", "-e", "USE example;"]
+      interval: 10s
+      retries: 5
+      start_period: 10s
+
+  
+  frontend:
+    image: react-java-frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+
+
+
+secrets:
+    mariadb_root_password:
+      file: ./db/password.txt
+
