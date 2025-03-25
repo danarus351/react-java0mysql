@@ -1,6 +1,6 @@
 services:
   backend:
-    image: react-java-backend:latest
+    image: danarus351/react-java-mysql:react-java-backend
     build:
       context: ./backend
       dockerfile: Dockerfile
@@ -14,8 +14,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+        
   db:
-    image: mariadb:10.6.4-focal
+    image: danarus351/react-java-mysql:mariadb:10.6.4-focal
     environment:
       - MYSQL_DATABASE=example 
       - MARIADB_ROOT_PASSWORD_FILE=/run/secrets/mariadb_root_password
@@ -29,7 +31,7 @@ services:
 
   
   frontend:
-    image: react-java-frontend:latest
+    image: danarus351/react-java-mysql:react-java-frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile
